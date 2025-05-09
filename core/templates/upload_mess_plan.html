@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Mess Plan</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h2>Upload Monthly Mess Plan</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+    <p><a href="{% url 'warden_dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

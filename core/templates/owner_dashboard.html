@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .btn-logout {
+            margin-top: 20px;
+        }
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1 class="text-center mb-4">Welcome, {{ user.username }}!</h1>
+
+        {% if messages %}
+            <div class="alert alert-info">
+                <ul class="mb-0">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% else %}
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Your Hostels</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for hostel in hostels %}
+                            <li class="list-group-item">{{ hostel.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Seat Availability</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hostel</th>
+                                    <th>Room</th>
+                                    <th>Total Beds</th>
+                                    <th>Occupied</th>
+                                    <th>Available</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in seat_availability %}
+                                    <tr>
+                                        <td>{{ item.hostel }}</td>
+                                        <td>{{ item.room }}</td>
+                                        <td>{{ item.total_beds }}</td>
+                                        <td>{{ item.occupied }}</td>
+                                        <td>{{ item.available }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Unpaid Students</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for item in unpaid_students %}
+                            <li class="list-group-item">{{ item.student }} ({{ item.hostel }}): {{ item.pending_amount }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Financial Overview</h2>
+                </div>
+                <div class="card-body">
+                    <h3>Total Revenue: {{ total_revenue }}</h3>
+                    <h3>Security Fees Collected: {{ security_fees }}</h3>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Hostel Revenue Report</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hostel</th>
+                                    <th>Fees Collected</th>
+                                    <th>Expenses</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in hostel_revenue %}
+                                    <tr>
+                                        <td>{{ item.hostel }}</td>
+                                        <td>{{ item.fees_collected }}</td>
+                                        <td>{{ item.expenses }}</td>
+                                        <td>{{ item.revenue }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Expenses by Category</h2>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for item in expenses_by_category %}
+                            <li class="list-group-item">{{ item.category__name }}: {{ item.total }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Create Warden</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {{ warden_form.as_p }}
+                        <button type="submit" class="btn btn-primary">Create Warden</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-logout">Logout</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

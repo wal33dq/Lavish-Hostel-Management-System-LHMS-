@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Allocate Room</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h2>Allocate Room for {{ student.name }}</h2>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Allocate</button>
+        </form>
+        <h3>Available Rooms</h3>
+        {% if available_rooms %}
+            <ul>
+                {% for room in available_rooms %}
+                    <li>Room {{ room.room_number }} ({{ room.bed_type }}): {{ room.available_beds }} bed(s) available</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="info">No rooms with available beds.</p>
+        {% endif %}
+    {% endif %}
+    <p><a href="{% url 'warden_dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

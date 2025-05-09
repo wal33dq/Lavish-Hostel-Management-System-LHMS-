@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }} (Admin)</h1>
+    
+    <h2>All Hostels</h2>
+    {% if hostels %}
+        <ul>
+        {% for hostel in hostels %}
+            <li>{{ hostel.name }} (Owner: {{ hostel.owner.username }})</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hostels in the system.</p>
+    {% endif %}
+
+    <h2>All Students</h2>
+    {% if students %}
+        <ul>
+        {% for student in students %}
+            <li>{{ student.name }} - Hostel: {{ student.hostel.name }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No students in the system.</p>
+    {% endif %}
+
+    <h2>All Fees</h2>
+    {% if fees %}
+        <ul>
+        {% for fee in fees %}
+            <li>{{ fee.student.name }} ({{ fee.student.hostel.name }}) - {{ fee.fee_type.name }}: Due {{ fee.due_amount }}, Paid {{ fee.paid_amount }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No fees recorded.</p>
+    {% endif %}
+
+    <h2>All Expenses</h2>
+    {% if expenses %}
+        <ul>
+        {% for expense in expenses %}
+            <li>{{ expense.description }} ({{ expense.hostel.name }}) - {{ expense.amount }} on {{ expense.date }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No expenses recorded.</p>
+    {% endif %}
+
+    <h2>Mess Plans ({{ current_month }})</h2>
+    {% if mess_plans %}
+        <ul>
+        {% for plan in mess_plans %}
+            <li>{{ plan.hostel.name }} - <a href="{{ plan.pdf_file_path }}">View Mess Plan for {{ plan.month }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No mess plans for this month.</p>
+    {% endif %}
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

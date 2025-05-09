@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h2>Add New Expense</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Expense</button>
+    </form>
+    <p><a href="{% url 'warden_dashboard' %}">Back to Dashboard</a></p>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Manage Fees</title></head>
+<body>
+    <h2>Manage Fees for {{ student.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'warden_dashboard' %}">Back</a>
+</body>
+</html>

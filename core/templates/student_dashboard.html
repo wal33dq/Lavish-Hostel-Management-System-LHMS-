@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .profile, .fees, .mess-plan {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .fees ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .fees li {
+            margin: 5px 0;
+        }
+        .status-paid {
+            color: green;
+            font-weight: bold;
+        }
+        .status-partial {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-due {
+            color: red;
+            font-weight: bold;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧑‍🎓 Welcome, {{ user.username }} (Student)</h1>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% else %}
+        <!-- Personal Profile Section -->
+        <div class="section profile">
+            <h2>Personal Profile</h2>
+            <p><strong>Name:</strong> {{ student.name }}</p>
+            <p><strong>Hostel:</strong> {{ student.hostel.name }}</p>
+            <p><strong>Address:</strong> {{ student.hostel.address }}</p>
+            {% if student.cnic %}
+                <p><strong>CNIC:</strong> {{ student.cnic }}</p>
+            {% endif %}
+            {% if student.emergency_contact_number %}
+                <p><strong>Emergency Contact Number:</strong> {{ student.emergency_contact_number }}</p>
+            {% endif %}
+            {% if student.room %}
+                <p><strong>Room:</strong> {{ student.room.room_number }}</p>
+            {% else %}
+                <p><strong>Room:</strong> Not assigned</p>
+            {% endif %}
+            {% if student.bed %}
+                <p><strong>Bed:</strong> {{ student.bed.bed_number }}</p>
+            {% else %}
+                <p><strong>Bed:</strong> Not assigned</p>
+            {% endif %}
+        </div>
+
+        <!-- Fee Status Section -->
+        <div class="section fees">
+            <h2>Fee Status</h2>
+            {% if fees %}
+                <ul>
+                {% for fee in fees %}
+                    <li>
+                        {{ fee.fee_type.name }} ({{ fee.period|default:"N/A" }}): 
+                        Due {{ fee.due_amount }} | Paid {{ fee.paid_amount }}
+                        <span class="{% if fee.paid_amount >= fee.due_amount %}status-paid{% elif fee.paid_amount > 0 %}status-partial{% else %}status-due{% endif %}">
+                            {% if fee.paid_amount >= fee.due_amount %}
+                                (Fully Paid)
+                            {% elif fee.paid_amount > 0 %}
+                                (Partially Paid)
+                            {% else %}
+                                (Due)
+                            {% endif %}
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No fees recorded.</p>
+            {% endif %}
+        </div>
+
+        <!-- Mess Menu Section -->
+        <div class="section mess-plan">
+            <h2>Mess Menu for {{ student.hostel.name }}</h2>
+            {% if mess_plan %}
+                <p>Menu for {{ mess_plan.month }}: 
+                    <a href="{{ mess_plan.pdf_file.url }}">View/Download PDF</a></p>
+                </p>
+            {% else %}
+                <p>No mess menu available for this month.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93b98bb00b29c25a',t:'MTc0NjU0NTcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

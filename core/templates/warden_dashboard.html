@@ -1,0 +1,150 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Warden Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; }
+        .student-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .student-table th, .student-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .student-table th { background-color: #f2f2f2; }
+        .fee-partially-paid { color: orange; }
+        .fee-fully-paid { color: green; }
+        a { color: #007bff; text-decoration: none; margin-right: 10px; }
+        a:hover { text-decoration: underline; }
+        .actions { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Welcome, {{ user.username }} (Warden)</h2>
+
+    <h3>Hostel: {{ hostel.name }}</h3>
+    <p>Address: {{ hostel.address }}</p>
+
+    <div class="actions">
+        <a href="{% url 'create_student_user' %}">Create Student User</a>
+        <a href="{% url 'create_room' %}">Create Room</a>
+        <a href="{% url 'upload_mess_plan' %}">Upload Mess Plan</a>
+        <a href="{% url 'add_expense' %}">Add Expense</a>
+        <a href="{% url 'manage_categories' %}">Manage Categories</a>
+    </div>
+
+    <h3>Students</h3>
+    <table class="student-table">
+        <tr>
+            <th>Name</th>
+            <th>Room</th>
+            <th>Bed</th>
+            <th>CNIC</th>
+            <th>Emergency Contact</th>
+            <th>Security Fee</th>
+            <th>Seat Fee</th>
+            <th>Mess Fee</th>
+            <th>Actions</th>
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.room.room_number|default:"Unassigned" }}</td>
+            <td>{{ student.bed.bed_number|default:"Unassigned" }}</td>
+            <td>{{ student.cnic|default:"Not Recorded" }}</td>
+            <td>{{ student.emergency_contact_number|default:"Not Recorded" }}</td>
+            <td>
+                {% with fee=fees_summary|keyvalue:student.id|keyvalue:"security" %}
+                    {% if fee %}
+                        Due: {{ fee.due_amount }}, Paid: {{ fee.paid_amount }}
+                        {% if fee.paid_amount < fee.due_amount %}
+                            <span class="fee-partially-paid">(Partially Paid)</span>
+                        {% else %}
+                            <span class="fee-fully-paid">(Fully Paid)</span>
+                        {% endif %}
+                    {% else %}
+                        Not Recorded
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td>
+                {% with fee=fees_summary|keyvalue:student.id|keyvalue:"seat" %}
+                    {% if fee %}
+                        Due: {{ fee.due_amount }}, Paid: {{ fee.paid_amount }}
+                        {% if fee.paid_amount < fee.due_amount %}
+                            <span class="fee-partially-paid">(Partially Paid)</span>
+                        {% else %}
+                            <span class="fee-fully-paid">(Fully Paid)</span>
+                        {% endif %}
+                    {% else %}
+                        Not Recorded
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td>
+                {% with fee=fees_summary|keyvalue:student.id|keyvalue:"mess" %}
+                    {% if fee %}
+                        Due: {{ fee.due_amount }}, Paid: {{ fee.paid_amount }}
+                        {% if fee.paid_amount < fee.due_amount %}
+                            <span class="fee-partially-paid">(Partially Paid)</span>
+                        {% else %}
+                            <span class="fee-fully-paid">(Fully Paid)</span>
+                        {% endif %}
+                    {% else %}
+                        Not Recorded
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td>
+                <a href="{% url 'allocate_room' student.id %}">Allocate Room</a>
+                <a href="{% url 'manage_fees' student.id %}">Manage Fees</a>
+                <a href="{% url 'update_student_cnic' student.id %}">Update CNIC</a>
+                <a href="{% url 'update_student_emergency_contact' student.id %}">Update Emergency Contact</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9">No students registered.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h3>Fee Status</h3>
+    <p>Total Fees Collected: Rs.{{ total_fees }}</p>
+    <p>Total Expenses: Rs.{{ total_expenses }}</p>
+    <p>Current Funds: Rs.{{ current_funds }}</p>
+
+    <h3>Recent Expenses</h3>
+    {% if recent_expenses %}
+        {% for expense in recent_expenses %}
+            <p>{{ expense.category }}: {{ expense.amount }} on {{ expense.date }}</p>
+        {% empty %}
+            <p>No recent expenses.</p>
+        {% endfor %}
+    {% else %}
+        <p>No recent expenses.</p>
+    {% endif %}
+
+    <h3>Mess Plan for {{ hostel.name }}</h3>
+    {% if mess_plan %}
+        <p>Menu for {{ mess_plan.month }}: <a href="{{ mess_plan.pdf_file.url }}">View/Download PDF</a></p>
+    {% else %}
+        <p>No mess plan available.</p>
+    {% endif %}
+
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+
+    <h3>Seat Availability</h3>
+    <table class="student-table">
+        <tr>
+            <th>Room</th>
+            <th>Total Beds</th>
+            <th>Occupied</th>
+            <th>Available</th>
+        </tr>
+        {% for room in hostel.rooms.all %}
+        <tr>
+            <td>{{ room.room_number }}</td>
+            <td>{{ room.number_of_beds }}</td>
+            <td>{{ room.occupants.count }}</td>
+            <td>{{ room.number_of_beds|subtract:room.occupants.count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!-- core/templates/update_student_cnic.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Student CNIC</title>
+</head>
+<body>
+    <h1>Update CNIC for {{ student.name }}</h1>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update CNIC</button>
+    </form>
+    <a href="{% url 'warden_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>
